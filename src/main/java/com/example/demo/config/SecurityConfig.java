@@ -1,5 +1,6 @@
 package com.example.demo.config;
 
+import com.example.demo.model.Role;
 import com.example.demo.security.jwt.JWTConfigurer;
 import com.example.demo.security.jwt.JWTTokenProvider;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,7 +19,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     private static final String ADMIN_ENDPOINT = "/admin/**";
     private static final String LOGIN_ENDPOINT = "/auth/login";
-    private static final String USER_ENDPOINT = "/user/**";
+    private static final String USER_ENDPOINT = "/users/**";
 
     @Autowired
     public SecurityConfig(JWTTokenProvider jwtTokenProvider) {
@@ -40,8 +41,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .and()
                 .authorizeRequests()
                 .antMatchers(LOGIN_ENDPOINT).permitAll()
-                .antMatchers(ADMIN_ENDPOINT).hasRole("ADMIN")
-                .antMatchers(USER_ENDPOINT).hasRole("USER")
+                .antMatchers(ADMIN_ENDPOINT, "/admin/users/**").hasAuthority("ADMIN")
+                .antMatchers(USER_ENDPOINT).hasAuthority("USER")
                 .anyRequest().authenticated()
                 .and()
                 .apply(new JWTConfigurer(jwtTokenProvider));

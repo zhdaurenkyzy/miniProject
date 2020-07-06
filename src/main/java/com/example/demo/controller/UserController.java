@@ -1,6 +1,8 @@
 package com.example.demo.controller;
 
 import com.example.demo.model.User;
+import com.example.demo.model.dto.UserDto;
+import com.example.demo.security.jwt.JWTUser;
 import com.example.demo.service.UserService;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,7 +27,7 @@ import java.util.List;
 import java.util.UUID;
 
 @RestController
-@RequestMapping(value = "/users", produces = MediaType.APPLICATION_JSON_VALUE)
+@RequestMapping(value = "/users/", produces = MediaType.APPLICATION_JSON_VALUE)
 public class UserController {
 
     @Value("${upload.folder}")
@@ -36,6 +38,17 @@ public class UserController {
     @Autowired
     public UserController(UserService userService) {
         this.userService = userService;
+    }
+
+    @RequestMapping(value = "{id}", method = RequestMethod.GET)
+    public ResponseEntity<UserDto> getUserById(@PathVariable(name = "id") Long userId){
+
+        User user = userService.getById(userId);
+        if(user == null){
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+        UserDto resultUserDto = UserDto.toDto(user);
+        return new ResponseEntity<>(resultUserDto, HttpStatus.OK);
     }
 
     @RequestMapping(value = "", method = RequestMethod.POST, consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
@@ -58,7 +71,7 @@ public class UserController {
         else return new ResponseEntity("please select a file with doc, docx or pdf type!", HttpStatus.OK);
     }
 
-    @RequestMapping(value = "/download", method = RequestMethod.GET)
+    @RequestMapping(value = "download", method = RequestMethod.GET)
     public ResponseEntity<Object> downloadFile(@RequestParam("filename") String filename) throws IOException  {
         File file = new File(filename);
         InputStreamResource resource = new InputStreamResource(new FileInputStream(file));
@@ -75,4 +88,5 @@ public class UserController {
 
         return responseEntity;
     }
+
 }

@@ -36,8 +36,8 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public User getById(Long id) {
-        return userRepository.findById(id).orElseThrow(() -> new NotFoundException("User not found by id " + id));
+    public User getById(Long userId) {
+        return userRepository.findById(userId).orElseThrow(() -> new NotFoundException("User not found by id " + userId));
     }
 
     @Override
@@ -56,11 +56,16 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public User findByUserName(String userName) {
-        User resultUser = userRepository.findUserByName(userName);
+        User resultUser = userRepository.findUserByUserName(userName);
         if(resultUser==null){
             log.warn("in findUserByName - no user found by name" + userName);
             throw new NotFoundException("User not found by name" + userName);
         }
         else return resultUser;
+    }
+
+    @Override
+    public Role findRoleByUserName(String userName) {
+        return userRepository.findRoleByUserName(userName);
     }
 }
