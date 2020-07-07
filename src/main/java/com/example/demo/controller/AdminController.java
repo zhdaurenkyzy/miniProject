@@ -3,6 +3,7 @@ package com.example.demo.controller;
 import com.example.demo.model.User;
 import com.example.demo.model.dto.AdminUserDto;
 import com.example.demo.model.dto.UserDto;
+import com.example.demo.model.mapper.AdminUserMapper;
 import com.example.demo.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -33,14 +34,14 @@ public class AdminController {
         if(user == null){
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
-        AdminUserDto resultAdminUserDto = AdminUserDto.toDto(user);
+        AdminUserDto resultAdminUserDto = AdminUserMapper.INSTANCE.toDto(user);
         return new ResponseEntity<>(resultAdminUserDto, HttpStatus.OK);
     }
 
     @GetMapping(value = "users/")
     public ResponseEntity<List<AdminUserDto>> getUsers(){
         List<User> users = userService.getAll();
-        List<AdminUserDto> resultUsers = users.stream().map(i -> AdminUserDto.toDto(i)).collect(Collectors.toList());
+        List<AdminUserDto> resultUsers = users.stream().map(i -> AdminUserMapper.INSTANCE.toDto(i)).collect(Collectors.toList());
         return new ResponseEntity<>(resultUsers, HttpStatus.OK);
     }
 }
