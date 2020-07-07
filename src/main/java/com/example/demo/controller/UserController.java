@@ -2,7 +2,7 @@ package com.example.demo.controller;
 
 import com.example.demo.model.User;
 import com.example.demo.model.dto.UserDto;
-import com.example.demo.security.jwt.JWTUser;
+import com.example.demo.security.jwt.JWTTokenProvider;
 import com.example.demo.service.UserService;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,6 +12,8 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -21,9 +23,6 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.sql.Blob;
-import java.util.Arrays;
-import java.util.List;
 import java.util.UUID;
 
 @RestController
@@ -32,23 +31,35 @@ public class UserController {
 
     @Value("${upload.folder}")
     private String uploadFolder;
-
+    private JWTTokenProvider jwtTokenProvider;
     private UserService userService;
 
     @Autowired
-    public UserController(UserService userService) {
+    public UserController(JWTTokenProvider jwtTokenProvider, UserService userService) {
+        this.jwtTokenProvider = jwtTokenProvider;
         this.userService = userService;
     }
 
-    @RequestMapping(value = "{id}", method = RequestMethod.GET)
-    public ResponseEntity<UserDto> getUserById(@PathVariable(name = "id") Long userId){
-
-        User user = userService.getById(userId);
-        if(user == null){
+    @RequestMapping(value = "", method = RequestMethod.GET)
+    public ResponseEntity<UserDto> getUser(@AuthenticationPrincipal UserDetails userDetails) {
+        User user = userService.findByUserName(userDetails.getUsername());
+        if (user == null) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
         UserDto resultUserDto = UserDto.toDto(user);
         return new ResponseEntity<>(resultUserDto, HttpStatus.OK);
+    }
+
+    @RequestMapping(value = "/{id}", method = RequestMethod.PUT)
+    public ResponseEntity<UserDto> updateUser(@PathVariable("id") Long userId, @RequestBody UserDto userDto) {
+        Long userDtoId = userDto.getId();
+        if (userId == userDtoId) {
+            User user = userDto.toUser();
+            userService.save(user);
+            UserDto userDTOUpdated = UserDto.toDto(userService.getById(user.getId()));
+            return new ResponseEntity<>(userDTOUpdated, HttpStatus.OK);
+        } else
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }
 
     @RequestMapping(value = "", method = RequestMethod.POST, consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
@@ -67,12 +78,11 @@ public class UserController {
             }
             return new ResponseEntity("Successfully uploaded - " +
                     file.getOriginalFilename(), new HttpHeaders(), HttpStatus.OK);
-        }
-        else return new ResponseEntity("please select a file with doc, docx or pdf type!", HttpStatus.OK);
+        } else return new ResponseEntity("please select a file with doc, docx or pdf type!", HttpStatus.OK);
     }
 
     @RequestMapping(value = "download", method = RequestMethod.GET)
-    public ResponseEntity<Object> downloadFile(@RequestParam("filename") String filename) throws IOException  {
+    public ResponseEntity<Object> downloadFile(@RequestParam("filename") String filename) throws IOException {
         File file = new File(filename);
         InputStreamResource resource = new InputStreamResource(new FileInputStream(file));
         HttpHeaders headers = new HttpHeaders();

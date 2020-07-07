@@ -57,14 +57,14 @@ public class JWTTokenProvider {
                 .compact();
     }
 
+    public String getUserName(String token){
+        return Jwts.parser().setSigningKey(secret).parseClaimsJws(token).getBody().getSubject();
+    }
+
     public Authentication getAuthentication(String token){
         UserDetails userDetails = this.userDetailsService.loadUserByUsername(getUserName(token));
         return new UsernamePasswordAuthenticationToken(userDetails, "", userDetails.getAuthorities());
 
-    }
-
-    public String getUserName(String token){
-        return Jwts.parser().setSigningKey(secret).parseClaimsJws(token).getBody().getSubject();
     }
 
     public String resolveToken(HttpServletRequest req){

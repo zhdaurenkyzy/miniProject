@@ -1,6 +1,7 @@
 package com.example.demo.controller;
 
 import com.example.demo.model.User;
+import com.example.demo.model.dto.AdminUserDto;
 import com.example.demo.model.dto.UserDto;
 import com.example.demo.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,6 +12,9 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping(value = "/admin/", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -24,12 +28,19 @@ public class AdminController {
     }
 
     @GetMapping(value = "users/{id}")
-    public ResponseEntity<UserDto> getUserById(@PathVariable(name = "id") Long userId){
+    public ResponseEntity<AdminUserDto> getUserById(@PathVariable(name = "id") Long userId){
         User user = userService.getById(userId);
         if(user == null){
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
-        UserDto resultUserDto = UserDto.toDto(user);
-        return new ResponseEntity<>(resultUserDto, HttpStatus.OK);
+        AdminUserDto resultAdminUserDto = AdminUserDto.toDto(user);
+        return new ResponseEntity<>(resultAdminUserDto, HttpStatus.OK);
+    }
+
+    @GetMapping(value = "users/")
+    public ResponseEntity<List<AdminUserDto>> getUsers(){
+        List<User> users = userService.getAll();
+        List<AdminUserDto> resultUsers = users.stream().map(i -> AdminUserDto.toDto(i)).collect(Collectors.toList());
+        return new ResponseEntity<>(resultUsers, HttpStatus.OK);
     }
 }

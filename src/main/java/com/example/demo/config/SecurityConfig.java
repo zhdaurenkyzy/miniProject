@@ -42,7 +42,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .authorizeRequests()
                 .antMatchers(LOGIN_ENDPOINT, "/auth/register").permitAll()
                 .antMatchers(ADMIN_ENDPOINT, "/admin/users/**").hasAuthority("ADMIN")
-                .antMatchers(USER_ENDPOINT).hasAuthority("USER")
+                .antMatchers(USER_ENDPOINT).hasAnyAuthority("USER", "ADMIN")
                 .anyRequest().authenticated()
                 .and()
                 .apply(new JWTConfigurer(jwtTokenProvider));

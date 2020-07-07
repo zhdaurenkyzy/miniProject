@@ -1,9 +1,9 @@
-package com.example.demo.model.dto;
+package com.example.demo.model.payload;
 
 import lombok.Data;
 
 @Data
-public class RegisterDto {
+public class RegisterOrUpdateRequest {
 
     private String userName;
     private String email;
