@@ -23,8 +23,9 @@ import java.util.stream.Collectors;
 @RequestMapping(value = "/articles/", produces = MediaType.APPLICATION_JSON_VALUE)
 public class ArticleController {
 
-    private ArticleService articleService;
     private UserService userService;
+    private ArticleService articleService;
+
 
     @Autowired
     public ArticleController(ArticleService articleService, UserService userService) {
