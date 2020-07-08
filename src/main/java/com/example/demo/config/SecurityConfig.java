@@ -1,10 +1,8 @@
 package com.example.demo.config;
 
-import com.example.demo.model.Role;
-import com.example.demo.security.jwt.JWTConfigurer;
-import com.example.demo.security.jwt.JWTTokenProvider;
+import com.example.demo.security.JWTConfigurer;
+import com.example.demo.security.JWTTokenProvider;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Configurable;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;

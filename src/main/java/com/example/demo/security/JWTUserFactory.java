@@ -1,4 +1,4 @@
-package com.example.demo.security.jwt;
+package com.example.demo.security;
 
 import com.example.demo.model.Role;
 import com.example.demo.model.User;
@@ -12,7 +12,7 @@ public final class JWTUserFactory {
     public JWTUserFactory() {
     }
 
-    public static JWTUser create(User user){
+    public static JWTUser create(User user) {
         return new JWTUser(
                 user.getId(),
                 user.getUserName(),
@@ -22,7 +22,7 @@ public final class JWTUserFactory {
         );
     }
 
-    private static List<GrantedAuthority> convertToGrantedAuthority(Role role){
+    private static List<GrantedAuthority> convertToGrantedAuthority(Role role) {
         List<GrantedAuthority> authList = new ArrayList<>();
         authList.add(role);
         return authList;

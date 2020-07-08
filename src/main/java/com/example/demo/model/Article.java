@@ -1,7 +1,5 @@
 package com.example.demo.model;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
-import com.fasterxml.jackson.annotation.JsonManagedReference;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -24,7 +22,7 @@ public class Article {
 
     @ManyToOne(cascade = CascadeType.MERGE, fetch = FetchType.EAGER)
     @JoinColumn(name = "ARTICLE_USER_ID")
-  //  @JsonBackReference
+    //  @JsonBackReference
     private User user;
 
     @OneToMany(mappedBy = "article", cascade = {CascadeType.ALL})

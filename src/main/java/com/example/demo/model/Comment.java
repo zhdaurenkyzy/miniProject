@@ -1,6 +1,5 @@
 package com.example.demo.model;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -21,7 +20,7 @@ public class Comment {
 
     @ManyToOne(cascade = CascadeType.MERGE, fetch = FetchType.EAGER)
     @JoinColumn(name = "COMMENT_AUTHOR_ID")
-  //  @JsonBackReference
+    //  @JsonBackReference
     private User author;
 
     @ManyToOne(cascade = CascadeType.MERGE, fetch = FetchType.EAGER)

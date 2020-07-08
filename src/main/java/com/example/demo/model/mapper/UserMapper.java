@@ -11,14 +11,16 @@ import org.mapstruct.factory.Mappers;
 public interface UserMapper {
 
     UserMapper INSTANCE = Mappers.getMapper(UserMapper.class);
+
     @Mappings({
-            @Mapping(source="articleList", target="articles"),
-            @Mapping(source="commentList", target="comments")
+            @Mapping(source = "articleList", target = "articles"),
+            @Mapping(source = "commentList", target = "comments")
     })
     UserDto toDto(User user);
+
     @Mappings({
-            @Mapping(source="articles", target="articleList"),
-            @Mapping(source="comments", target="commentList")
+            @Mapping(source = "articles", target = "articleList"),
+            @Mapping(source = "comments", target = "commentList")
     })
     User toUser(UserDto userDto);
 }

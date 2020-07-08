@@ -1,4 +1,4 @@
-package com.example.demo.security.jwt;
+package com.example.demo.security;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.springframework.security.core.GrantedAuthority;
@@ -62,6 +62,7 @@ public class JWTUser implements UserDetails {
     public boolean isAccountNonLocked() {
         return true;
     }
+
     @JsonIgnore
     @Override
     public boolean isCredentialsNonExpired() {

@@ -2,7 +2,6 @@ package com.example.demo.controller;
 
 import com.example.demo.model.User;
 import com.example.demo.model.dto.AdminUserDto;
-import com.example.demo.model.dto.UserDto;
 import com.example.demo.model.mapper.AdminUserMapper;
 import com.example.demo.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,9 +28,9 @@ public class AdminController {
     }
 
     @GetMapping(value = "users/{id}")
-    public ResponseEntity<AdminUserDto> getUserById(@PathVariable(name = "id") Long userId){
+    public ResponseEntity<AdminUserDto> getUserById(@PathVariable(name = "id") Long userId) {
         User user = userService.getById(userId);
-        if(user == null){
+        if (user == null) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
         AdminUserDto resultAdminUserDto = AdminUserMapper.INSTANCE.toDto(user);
@@ -39,7 +38,7 @@ public class AdminController {
     }
 
     @GetMapping(value = "users/")
-    public ResponseEntity<List<AdminUserDto>> getUsers(){
+    public ResponseEntity<List<AdminUserDto>> getUsers() {
         List<User> users = userService.getAll();
         List<AdminUserDto> resultUsers = users.stream().map(i -> AdminUserMapper.INSTANCE.toDto(i)).collect(Collectors.toList());
         return new ResponseEntity<>(resultUsers, HttpStatus.OK);

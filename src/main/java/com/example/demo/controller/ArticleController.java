@@ -2,14 +2,9 @@ package com.example.demo.controller;
 
 import com.example.demo.model.Article;
 import com.example.demo.model.User;
-import com.example.demo.model.dto.AdminUserDto;
 import com.example.demo.model.dto.ArticleDto;
-import com.example.demo.model.dto.UserDto;
-import com.example.demo.model.mapper.AdminUserMapper;
 import com.example.demo.model.mapper.ArticleMapper;
-import com.example.demo.model.mapper.UserMapper;
 import com.example.demo.model.payload.ArticleRequest;
-import com.example.demo.model.payload.RegisterOrUpdateRequest;
 import com.example.demo.service.ArticleService;
 import com.example.demo.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,7 +19,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @RestController
-@RequestMapping(value = "/article/", produces = MediaType.APPLICATION_JSON_VALUE)
+@RequestMapping(value = "/articles/", produces = MediaType.APPLICATION_JSON_VALUE)
 public class ArticleController {
 
     private ArticleService articleService;
@@ -51,7 +46,7 @@ public class ArticleController {
     public ResponseEntity<Object> delete(@PathVariable Long id, @AuthenticationPrincipal UserDetails userDetails) {
         User user = userService.findByUserName(userDetails.getUsername());
         Article article = articleService.getById(id);
-        if(article.getUser()==user) {
+        if (article.getUser() == user) {
             articleService.deleteById(id);
             return new ResponseEntity<>(HttpStatus.OK);
         } else
@@ -62,7 +57,7 @@ public class ArticleController {
     public ResponseEntity<ArticleDto> updateArticle(@PathVariable("id") Long id, @RequestBody ArticleRequest articleRequest, @AuthenticationPrincipal UserDetails userDetails) {
         User user = userService.findByUserName(userDetails.getUsername());
         Article article = articleService.getById(id);
-        if (article.getUser()==user) {
+        if (article.getUser() == user) {
             article.setTitle(articleRequest.getTitle());
             article.setText(articleRequest.getText());
             articleService.save(article);
@@ -88,12 +83,12 @@ public class ArticleController {
     }
 
     @GetMapping(value = "{id}")
-    public ResponseEntity<ArticleDto> getArticleById(@PathVariable(name = "id") Long articleId){
+    public ResponseEntity<ArticleDto> getArticleById(@PathVariable(name = "id") Long articleId) {
         Article article = articleService.getById(articleId);
-        if(article == null){
+        if (article == null) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
-       ArticleDto articleDto= ArticleMapper.INSTANCE.toDto(article);
+        ArticleDto articleDto = ArticleMapper.INSTANCE.toDto(article);
         return new ResponseEntity<>(articleDto, HttpStatus.OK);
     }
 

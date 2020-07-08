@@ -1,16 +1,11 @@
 package com.example.demo.controller;
 
-import com.example.demo.model.Article;
 import com.example.demo.model.User;
-import com.example.demo.model.dto.ArticleDto;
 import com.example.demo.model.dto.UserDto;
-import com.example.demo.model.mapper.ArticleMapper;
 import com.example.demo.model.mapper.UserMapper;
 import com.example.demo.model.payload.RegisterOrUpdateRequest;
-import com.example.demo.security.jwt.JWTTokenProvider;
-import com.example.demo.service.ArticleService;
+import com.example.demo.security.JWTTokenProvider;
 import com.example.demo.service.UserService;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.InputStreamResource;
@@ -77,7 +72,7 @@ public class UserController {
     @RequestMapping(value = "{id}", method = RequestMethod.DELETE)
     public ResponseEntity<Object> delete(@PathVariable Long id, @AuthenticationPrincipal UserDetails userDetails) {
         User user = userService.findByUserName(userDetails.getUsername());
-        if(id==user.getId()) {
+        if (id == user.getId()) {
             userService.deleteById(id);
             return new ResponseEntity<>(HttpStatus.OK);
         } else

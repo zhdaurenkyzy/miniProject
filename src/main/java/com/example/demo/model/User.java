@@ -1,11 +1,9 @@
 package com.example.demo.model;
 
-import com.fasterxml.jackson.annotation.JsonManagedReference;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
-import java.io.File;
 import java.util.List;
 
 @Entity
@@ -36,10 +34,10 @@ public class User {
     private String file;
 
     @OneToMany(mappedBy = "user", cascade = {CascadeType.ALL})
-  //  @JsonManagedReference
-    List<Article> articleList;
+    //  @JsonManagedReference
+            List<Article> articleList;
 
     @OneToMany(mappedBy = "author", cascade = {CascadeType.ALL})
     //@JsonManagedReference
-    List<Comment> commentList;
+            List<Comment> commentList;
 }

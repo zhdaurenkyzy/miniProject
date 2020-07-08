@@ -3,7 +3,7 @@ package com.example.demo.controller;
 import com.example.demo.model.User;
 import com.example.demo.model.payload.AuthenticationRequest;
 import com.example.demo.model.payload.RegisterOrUpdateRequest;
-import com.example.demo.security.jwt.JWTTokenProvider;
+import com.example.demo.security.JWTTokenProvider;
 import com.example.demo.service.UserService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;

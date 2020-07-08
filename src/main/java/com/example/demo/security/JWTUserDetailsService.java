@@ -1,9 +1,6 @@
 package com.example.demo.security;
 
-import com.example.demo.exception.NotFoundException;
 import com.example.demo.model.User;
-import com.example.demo.security.jwt.JWTUser;
-import com.example.demo.security.jwt.JWTUserFactory;
 import com.example.demo.service.UserService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,7 +23,7 @@ public class JWTUserDetailsService implements UserDetailsService {
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         User user = userService.findByUserName(username);
-        if(user==null){
+        if (user == null) {
             throw new UsernameNotFoundException("User with userName: " + username + "not found");
         }
         JWTUser jwtUser = JWTUserFactory.create(user);
