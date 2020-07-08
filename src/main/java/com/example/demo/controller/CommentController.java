@@ -25,8 +25,9 @@ import java.util.stream.Collectors;
 public class CommentController {
 
     private CommentService commentService;
-    private UserService userService;
     private ArticleService articleService;
+    private UserService userService;
+
 
     @Autowired
     public CommentController(CommentService commentService, UserService userService, ArticleService articleService) {
