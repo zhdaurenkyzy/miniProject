@@ -24,9 +24,9 @@ public class Article {
 
     @ManyToOne(cascade = CascadeType.MERGE, fetch = FetchType.EAGER)
     @JoinColumn(name = "ARTICLE_USER_ID")
-    @JsonBackReference
+  //  @JsonBackReference
     private User user;
 
     @OneToMany(mappedBy = "article", cascade = {CascadeType.ALL})
-    private List<Comment> commentList;
+    private List<Comment> list;
 }

@@ -1,10 +1,14 @@
 package com.example.demo.controller;
 
+import com.example.demo.model.Article;
 import com.example.demo.model.User;
+import com.example.demo.model.dto.ArticleDto;
 import com.example.demo.model.dto.UserDto;
+import com.example.demo.model.mapper.ArticleMapper;
 import com.example.demo.model.mapper.UserMapper;
 import com.example.demo.model.payload.RegisterOrUpdateRequest;
 import com.example.demo.security.jwt.JWTTokenProvider;
+import com.example.demo.service.ArticleService;
 import com.example.demo.service.UserService;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -56,7 +60,7 @@ public class UserController {
         return new ResponseEntity<>(resultUserDto, HttpStatus.OK);
     }
 
-    @RequestMapping(value = "/{id}", method = RequestMethod.PUT)
+    @RequestMapping(value = "{id}", method = RequestMethod.PUT)
     public ResponseEntity<UserDto> updateUser(@PathVariable("id") Long userId, @RequestBody RegisterOrUpdateRequest updateRequest, @AuthenticationPrincipal UserDetails userDetails) {
         User user = userService.findByUserName(userDetails.getUsername());
         if (userId == user.getId()) {
@@ -64,10 +68,20 @@ public class UserController {
             user.setEmail(updateRequest.getEmail());
             user.setPassword(passwordEncoder.encode(updateRequest.getPassword()));
             userService.save(user);
-            UserDto userDTOUpdated = UserMapper.INSTANCE.toDto(userService.getById(user.getId()));
+            UserDto userDTOUpdated = UserMapper.INSTANCE.toDto(userService.getById(userId));
             return new ResponseEntity<>(userDTOUpdated, HttpStatus.OK);
         } else
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+    }
+
+    @RequestMapping(value = "{id}", method = RequestMethod.DELETE)
+    public ResponseEntity<Object> delete(@PathVariable Long id, @AuthenticationPrincipal UserDetails userDetails) {
+        User user = userService.findByUserName(userDetails.getUsername());
+        if(id==user.getId()) {
+            userService.deleteById(id);
+            return new ResponseEntity<>(HttpStatus.OK);
+        } else
+            return new ResponseEntity<>("Incorrect id in URL ", HttpStatus.FORBIDDEN);
     }
 
     @RequestMapping(value = "", method = RequestMethod.POST, consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
@@ -94,7 +108,6 @@ public class UserController {
         File file = new File(filename);
         InputStreamResource resource = new InputStreamResource(new FileInputStream(file));
         HttpHeaders headers = new HttpHeaders();
-
         headers.add("Content-Disposition", String.format("attachment; filename=\"%s\"", file.getName()));
         headers.add("Cache-Control", "no-cache, no-store, must-revalidate");
         headers.add("Pragma", "no-cache");
@@ -103,7 +116,6 @@ public class UserController {
         ResponseEntity<Object>
                 responseEntity = ResponseEntity.ok()
                 .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + file.getName() + "\"").body(resource);
-
         return responseEntity;
     }
 

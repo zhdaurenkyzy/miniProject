@@ -13,14 +13,12 @@ import org.mapstruct.factory.Mappers;
 public interface ArticleMapper {
     ArticleMapper INSTANCE = Mappers.getMapper(ArticleMapper.class);
     @Mappings({
-            @Mapping(source="article.user.userName", target="userName"),
-            @Mapping(source="commentList", target="comments")
+            @Mapping(source="list", target="comments")
     })
     ArticleDto toDto(Article article);
 
     @Mappings({
-            @Mapping(source="articleDto.userName", target="user.userName"),
-            @Mapping(source="comments", target="commentList")
+            @Mapping(source="comments", target="list")
     })
     Article toArticle(ArticleDto articleDto);
 }

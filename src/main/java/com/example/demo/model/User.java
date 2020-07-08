@@ -36,10 +36,10 @@ public class User {
     private String file;
 
     @OneToMany(mappedBy = "user", cascade = {CascadeType.ALL})
-    @JsonManagedReference
+  //  @JsonManagedReference
     List<Article> articleList;
 
     @OneToMany(mappedBy = "author", cascade = {CascadeType.ALL})
-    @JsonManagedReference
+    //@JsonManagedReference
     List<Comment> commentList;
 }

@@ -16,6 +16,6 @@ public class ArticleDto {
     private Long articleId;
     private String title;
     private String text;
-    private String userName;
+   // private String userName;
     private List<CommentDto> comments;
 }

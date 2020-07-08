@@ -2,6 +2,7 @@ package com.example.demo.service.impl;
 
 import com.example.demo.exception.NotFoundException;
 import com.example.demo.model.Article;
+import com.example.demo.model.User;
 import com.example.demo.repository.ArticleRepository;
 import com.example.demo.service.ArticleService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,5 +38,10 @@ public class ArticleServiceImpl implements ArticleService {
     @Override
     public void deleteById(Long id) {
         articleRepository.deleteById(id);
+    }
+
+    @Override
+    public List<Article> findAllByUser(User user) {
+        return articleRepository.findAllByUser(user);
     }
 }

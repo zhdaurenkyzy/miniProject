@@ -21,7 +21,7 @@ public class Comment {
 
     @ManyToOne(cascade = CascadeType.MERGE, fetch = FetchType.EAGER)
     @JoinColumn(name = "COMMENT_AUTHOR_ID")
-    @JsonBackReference
+  //  @JsonBackReference
     private User author;
 
     @ManyToOne(cascade = CascadeType.MERGE, fetch = FetchType.EAGER)
