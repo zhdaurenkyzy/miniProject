@@ -17,6 +17,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -36,8 +37,8 @@ public class CommentController {
         this.articleService = articleService;
     }
 
-    @RequestMapping(value = "{id}", method = RequestMethod.POST)
-    public ResponseEntity<Object> createComment(@PathVariable("id") Long articleId, @AuthenticationPrincipal UserDetails userDetails, @RequestBody CommentRequest commentRequest) {
+    @RequestMapping(value = "article/{id}", method = RequestMethod.POST)
+    public ResponseEntity<Object> createComment(@PathVariable("id") Long articleId, @AuthenticationPrincipal UserDetails userDetails,@Valid @RequestBody CommentRequest commentRequest) {
         User user = userService.findByUserName(userDetails.getUsername());
         Article article = articleService.getById(articleId);
         if (article != null) {
@@ -63,7 +64,7 @@ public class CommentController {
     }
 
     @RequestMapping(value = "{id}", method = RequestMethod.PUT)
-    public ResponseEntity<CommentDto> updateComment(@PathVariable("id") Long id, @RequestBody CommentRequest commentRequest, @AuthenticationPrincipal UserDetails userDetails) {
+    public ResponseEntity<CommentDto> updateComment(@PathVariable("id") Long id, @Valid @RequestBody CommentRequest commentRequest, @AuthenticationPrincipal UserDetails userDetails) {
         User user = userService.findByUserName(userDetails.getUsername());
         Comment comment = commentService.getById(id);
         if (comment.getAuthor() == user) {

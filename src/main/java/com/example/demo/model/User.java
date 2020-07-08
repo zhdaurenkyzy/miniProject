@@ -1,9 +1,13 @@
 package com.example.demo.model;
 
+import com.example.demo.validation.CustomValidPassword;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
+import javax.validation.constraints.Email;
+import javax.validation.constraints.Size;
 import java.util.List;
 
 @Entity
@@ -17,12 +21,15 @@ public class User {
     private Long id;
 
     @Column(name = "NAME")
+    @Size(min = 4, message = "UserName must contain min of 4 symbols")
     private String userName;
 
     @Column(name = "EMAIL")
+    @Email
     private String email;
 
     @Column(name = "PASSWORD")
+    @CustomValidPassword
     private String password;
 
     @Column(name = "ROLE")
@@ -34,10 +41,10 @@ public class User {
     private String file;
 
     @OneToMany(mappedBy = "user", cascade = {CascadeType.ALL})
-    //  @JsonManagedReference
-            List<Article> articleList;
+    @JsonManagedReference
+    private List<Article> articleList;
 
     @OneToMany(mappedBy = "author", cascade = {CascadeType.ALL})
-    //@JsonManagedReference
-            List<Comment> commentList;
+    @JsonManagedReference
+    private List<Comment> commentList;
 }

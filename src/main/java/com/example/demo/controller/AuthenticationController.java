@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.validation.Valid;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -40,7 +41,7 @@ public class AuthenticationController {
     }
 
     @PostMapping("login")
-    public ResponseEntity login(@RequestBody AuthenticationRequest requestDto) {
+    public ResponseEntity login(@Valid @RequestBody AuthenticationRequest requestDto) {
         try {
             String userName = requestDto.getUserName();
             authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(userName, requestDto.getPassword()));
@@ -60,7 +61,7 @@ public class AuthenticationController {
     }
 
     @PostMapping("register")
-    public ResponseEntity register(@RequestBody RegisterOrUpdateRequest registerDto) {
+    public ResponseEntity register(@Valid @RequestBody RegisterOrUpdateRequest registerDto) {
         String userName = registerDto.getUserName();
         if (userService.findByUserName(userName) != null) {
             return new ResponseEntity<>("User with username: " + userName + " already is existed", HttpStatus.BAD_REQUEST);

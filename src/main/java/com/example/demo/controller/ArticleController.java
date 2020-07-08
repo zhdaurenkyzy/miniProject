@@ -15,6 +15,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -32,7 +33,7 @@ public class ArticleController {
     }
 
     @RequestMapping(value = "", method = RequestMethod.POST)
-    public ResponseEntity<ArticleDto> createArticle(@AuthenticationPrincipal UserDetails userDetails, @RequestBody ArticleRequest articleRequest) {
+    public ResponseEntity<ArticleDto> createArticle(@AuthenticationPrincipal UserDetails userDetails, @Valid @RequestBody ArticleRequest articleRequest) {
         User user = userService.findByUserName(userDetails.getUsername());
         Article article = new Article();
         article.setText(articleRequest.getText());
@@ -54,7 +55,7 @@ public class ArticleController {
     }
 
     @RequestMapping(value = "{id}", method = RequestMethod.PUT)
-    public ResponseEntity<ArticleDto> updateArticle(@PathVariable("id") Long id, @RequestBody ArticleRequest articleRequest, @AuthenticationPrincipal UserDetails userDetails) {
+    public ResponseEntity<ArticleDto> updateArticle(@PathVariable("id") Long id, @Valid @RequestBody ArticleRequest articleRequest, @AuthenticationPrincipal UserDetails userDetails) {
         User user = userService.findByUserName(userDetails.getUsername());
         Article article = articleService.getById(id);
         if (article.getUser() == user) {
