@@ -10,25 +10,21 @@ import com.example.demo.util.SetterFieldsUtil;
 import com.example.demo.util.ValidationUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.core.io.InputStreamResource;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.util.FileCopyUtils;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.servlet.ServletOutputStream;
+import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.UUID;
+import java.io.OutputStream;
 
 @RestController
 @RequestMapping(value = "/users/", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -51,13 +47,13 @@ public class UserController {
     @RequestMapping(value = "", method = RequestMethod.GET)
     public ResponseEntity<UserDto> getUser(@AuthenticationPrincipal UserDetails userDetails) {
         User user = userService.findByUserName(userDetails.getUsername());
-        ValidationUtil.isNotFound(user==null);
+        ValidationUtil.isNotFound(user == null);
         UserDto resultUserDto = UserMapper.INSTANCE.toDto(user);
         return new ResponseEntity<>(resultUserDto, HttpStatus.OK);
     }
 
     @RequestMapping(value = "{id}", method = RequestMethod.PUT)
-    public ResponseEntity<UserDto> updateUser(@PathVariable("id") Long userId,@Valid @RequestBody RegisterOrUpdateRequest updateRequest, @AuthenticationPrincipal UserDetails userDetails) {
+    public ResponseEntity<UserDto> updateUser(@PathVariable("id") Long userId, @Valid @RequestBody RegisterOrUpdateRequest updateRequest, @AuthenticationPrincipal UserDetails userDetails) {
         User user = userService.findByUserName(userDetails.getUsername());
         if (userId == user.getId()) {
             SetterFieldsUtil.setFieldsUser(user, updateRequest);
@@ -79,39 +75,33 @@ public class UserController {
             return new ResponseEntity<>("Incorrect id in URL ", HttpStatus.FORBIDDEN);
     }
 
-    @RequestMapping(value = "", method = RequestMethod.POST, consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<String> saveFile(@RequestParam MultipartFile file) {
-        if (file.isEmpty()) {
-            return new ResponseEntity("please select a file!", HttpStatus.OK);
-        } else if (file.getContentType().contains("doc") | file.getContentType().contains("docx") |
-                file.getContentType().contains("pdf")) {
-            try {
-                byte[] bytes = file.getBytes();
-                String resultFileName = UUID.randomUUID().toString() + "." + file.getOriginalFilename();
-                Path path = Paths.get(uploadFolder + resultFileName);
-                Files.write(path, bytes);
-            } catch (IOException e) {
-                return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+    @RequestMapping(value = "file/save", method = RequestMethod.POST, consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<String> saveFile(@RequestParam MultipartFile file, @AuthenticationPrincipal UserDetails userDetails) {
+        try {
+            User user = userService.findByUserName(userDetails.getUsername());
+            if (file.getContentType().contains("jpeg")
+                    | file.getContentType().contains("png")) {
+                user.setFile(FileCopyUtils.copyToByteArray(file.getInputStream()));
+                userService.save(user);
+                return new ResponseEntity("Successfully uploaded - " +
+                        file.getOriginalFilename(), HttpStatus.OK);
+            } else {
+                return new ResponseEntity("File " + file.getOriginalFilename()
+                        + " must contain contentType: jpeg or png", HttpStatus.BAD_REQUEST);
             }
-            return new ResponseEntity("Successfully uploaded - " +
-                    file.getOriginalFilename(), new HttpHeaders(), HttpStatus.OK);
-        } else return new ResponseEntity("please select a file with doc, docx or pdf type!", HttpStatus.OK);
+        } catch (IOException e) {
+            return new ResponseEntity("Failed to write the object to the database" +
+                    file.getOriginalFilename(), HttpStatus.BAD_REQUEST);
+        }
+
     }
 
-    @RequestMapping(value = "download", method = RequestMethod.GET)
-    public ResponseEntity<Object> downloadFile(@RequestParam("filename") String filename) throws IOException {
-        File file = new File(filename);
-        InputStreamResource resource = new InputStreamResource(new FileInputStream(file));
-        HttpHeaders headers = new HttpHeaders();
-        headers.add("Content-Disposition", String.format("attachment; filename=\"%s\"", file.getName()));
-        headers.add("Cache-Control", "no-cache, no-store, must-revalidate");
-        headers.add("Pragma", "no-cache");
-        headers.add("Expires", "0");
-
-        ResponseEntity<Object>
-                responseEntity = ResponseEntity.ok()
-                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + file.getName() + "\"").body(resource);
-        return responseEntity;
+    @RequestMapping(value = "file/download", method = RequestMethod.GET)
+    public ResponseEntity<?> downloadFile(@AuthenticationPrincipal UserDetails userDetails, HttpServletResponse resp) throws IOException {
+        User user = userService.findByUserName(userDetails.getUsername());
+        OutputStream outputStream = resp.getOutputStream();
+        FileCopyUtils.copy(user.getFile(), outputStream);
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 
 }
