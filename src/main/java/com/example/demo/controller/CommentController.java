@@ -9,15 +9,18 @@ import com.example.demo.model.payload.CommentRequest;
 import com.example.demo.service.ArticleService;
 import com.example.demo.service.CommentService;
 import com.example.demo.service.UserService;
+import com.example.demo.util.ValidationUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.validation.ValidationUtils;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import javax.validation.Validation;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -79,9 +82,7 @@ public class CommentController {
     @GetMapping(value = "{id}")
     public ResponseEntity<CommentDto> getCommentById(@PathVariable(name = "id") Long id) {
         Comment comment = commentService.getById(id);
-        if (comment == null) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
+        ValidationUtil.isNotFound(comment==null);
         CommentDto commentDto = CommentMapper.INSTANCE.toDto(comment);
         return new ResponseEntity<>(commentDto, HttpStatus.OK);
     }

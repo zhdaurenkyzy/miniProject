@@ -7,6 +7,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.http.SessionCreationPolicy;
 
@@ -16,8 +17,9 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     private final JWTTokenProvider jwtTokenProvider;
 
     private static final String ADMIN_ENDPOINT = "/admin/**";
-    private static final String LOGIN_ENDPOINT = "/auth/login";
+    private static final String AUTH_ENDPOINT = "/auth/**";
     private static final String USER_ENDPOINT = "/users/**";
+    private static final String COMMENT_ENDPOINT = "/comments/**";
 
     @Autowired
     public SecurityConfig(JWTTokenProvider jwtTokenProvider) {
@@ -38,9 +40,17 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and()
                 .authorizeRequests()
-                .antMatchers(LOGIN_ENDPOINT, "/auth/register").permitAll()
+                .antMatchers(AUTH_ENDPOINT, "/swagger-ui.html", "/swagger-resources/**", "/v2/**",
+                        "/**/*.html",
+                        "/**/*.css",
+                        "/**/*.js",
+                        "/**/*.png",
+                        "/**/*.gif",
+                        "/**/*.jpg",
+                        "/**/*.svg"
+                        ).permitAll()
                 .antMatchers(ADMIN_ENDPOINT, "/admin/users/**").hasAuthority("ADMIN")
-                .antMatchers(USER_ENDPOINT).hasAnyAuthority("USER", "ADMIN")
+                .antMatchers(USER_ENDPOINT, COMMENT_ENDPOINT).hasAnyAuthority("USER", "ADMIN")
                 .anyRequest().authenticated()
                 .and()
                 .apply(new JWTConfigurer(jwtTokenProvider));

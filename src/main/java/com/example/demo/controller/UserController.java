@@ -6,6 +6,8 @@ import com.example.demo.model.mapper.UserMapper;
 import com.example.demo.model.payload.RegisterOrUpdateRequest;
 import com.example.demo.security.JWTTokenProvider;
 import com.example.demo.service.UserService;
+import com.example.demo.util.SetterFieldsUtil;
+import com.example.demo.util.ValidationUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.InputStreamResource;
@@ -49,9 +51,7 @@ public class UserController {
     @RequestMapping(value = "", method = RequestMethod.GET)
     public ResponseEntity<UserDto> getUser(@AuthenticationPrincipal UserDetails userDetails) {
         User user = userService.findByUserName(userDetails.getUsername());
-        if (user == null) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
+        ValidationUtil.isNotFound(user==null);
         UserDto resultUserDto = UserMapper.INSTANCE.toDto(user);
         return new ResponseEntity<>(resultUserDto, HttpStatus.OK);
     }
@@ -60,8 +60,7 @@ public class UserController {
     public ResponseEntity<UserDto> updateUser(@PathVariable("id") Long userId,@Valid @RequestBody RegisterOrUpdateRequest updateRequest, @AuthenticationPrincipal UserDetails userDetails) {
         User user = userService.findByUserName(userDetails.getUsername());
         if (userId == user.getId()) {
-            user.setUserName(updateRequest.getUserName());
-            user.setEmail(updateRequest.getEmail());
+            SetterFieldsUtil.setFieldsUser(user, updateRequest);
             user.setPassword(passwordEncoder.encode(updateRequest.getPassword()));
             userService.save(user);
             UserDto userDTOUpdated = UserMapper.INSTANCE.toDto(userService.getById(userId));

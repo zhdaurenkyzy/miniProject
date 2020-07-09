@@ -5,9 +5,11 @@ import com.example.demo.model.payload.AuthenticationRequest;
 import com.example.demo.model.payload.RegisterOrUpdateRequest;
 import com.example.demo.security.JWTTokenProvider;
 import com.example.demo.service.UserService;
+import com.example.demo.util.SetterFieldsUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -24,7 +26,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 @RestController
-@RequestMapping(value = "/auth/")
+@RequestMapping(value = "/auth/", produces = MediaType.APPLICATION_JSON_VALUE)
 @Slf4j
 public class AuthenticationController {
 
@@ -53,7 +55,6 @@ public class AuthenticationController {
             Map<Object, Object> response = new HashMap<>();
             response.put("userName", userName);
             response.put("token", token);
-
             return ResponseEntity.ok(response);
         } catch (AuthenticationException e) {
             throw new BadCredentialsException("Invalid userName or password");
@@ -67,8 +68,7 @@ public class AuthenticationController {
             return new ResponseEntity<>("User with username: " + userName + " already is existed", HttpStatus.BAD_REQUEST);
         }
         User user = new User();
-        user.setUserName(registerDto.getUserName());
-        user.setEmail(registerDto.getEmail());
+        SetterFieldsUtil.setFieldsUser(user, registerDto);
         user.setPassword(registerDto.getPassword());
         userService.register(user);
         return new ResponseEntity("User " + userName + " has successfully registered", HttpStatus.CREATED);

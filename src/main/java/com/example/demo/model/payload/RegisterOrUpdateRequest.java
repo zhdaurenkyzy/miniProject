@@ -16,4 +16,5 @@ public class RegisterOrUpdateRequest {
 
     @CustomValidPassword
     private String password;
+
 }

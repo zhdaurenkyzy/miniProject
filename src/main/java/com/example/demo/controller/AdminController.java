@@ -4,6 +4,8 @@ import com.example.demo.model.User;
 import com.example.demo.model.dto.AdminUserDto;
 import com.example.demo.model.mapper.AdminUserMapper;
 import com.example.demo.service.UserService;
+import com.example.demo.util.ValidationUtil;
+import io.swagger.annotations.Api;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -30,9 +32,7 @@ public class AdminController {
     @GetMapping(value = "users/{id}")
     public ResponseEntity<AdminUserDto> getUserById(@PathVariable(name = "id") Long userId) {
         User user = userService.getById(userId);
-        if (user == null) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
+        ValidationUtil.isNotFound(user==null);
         AdminUserDto resultAdminUserDto = AdminUserMapper.INSTANCE.toDto(user);
         return new ResponseEntity<>(resultAdminUserDto, HttpStatus.OK);
     }

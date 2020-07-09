@@ -7,6 +7,8 @@ import com.example.demo.model.mapper.ArticleMapper;
 import com.example.demo.model.payload.ArticleRequest;
 import com.example.demo.service.ArticleService;
 import com.example.demo.service.UserService;
+import com.example.demo.util.SetterFieldsUtil;
+import com.example.demo.util.ValidationUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -37,8 +39,7 @@ public class ArticleController {
     public ResponseEntity<ArticleDto> createArticle(@AuthenticationPrincipal UserDetails userDetails, @Valid @RequestBody ArticleRequest articleRequest) {
         User user = userService.findByUserName(userDetails.getUsername());
         Article article = new Article();
-        article.setText(articleRequest.getText());
-        article.setTitle(articleRequest.getTitle());
+        SetterFieldsUtil.setFieldsArticle(article, articleRequest);
         article.setUser(user);
         articleService.save(article);
         return new ResponseEntity<>(HttpStatus.OK);
@@ -60,8 +61,7 @@ public class ArticleController {
         User user = userService.findByUserName(userDetails.getUsername());
         Article article = articleService.getById(id);
         if (article.getUser() == user) {
-            article.setTitle(articleRequest.getTitle());
-            article.setText(articleRequest.getText());
+            SetterFieldsUtil.setFieldsArticle(article, articleRequest);
             articleService.save(article);
             ArticleDto articleDto = ArticleMapper.INSTANCE.toDto(articleService.getById(id));
             return new ResponseEntity<>(articleDto, HttpStatus.OK);
@@ -87,9 +87,7 @@ public class ArticleController {
     @GetMapping(value = "{id}")
     public ResponseEntity<ArticleDto> getArticleById(@PathVariable(name = "id") Long articleId) {
         Article article = articleService.getById(articleId);
-        if (article == null) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
+        ValidationUtil.isNotFound(article==null);
         ArticleDto articleDto = ArticleMapper.INSTANCE.toDto(article);
         return new ResponseEntity<>(articleDto, HttpStatus.OK);
     }
